@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  ecowave:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ecowave_data:/app/data
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
+      - SPRING_DATASOURCE_USERNAME=RM550975
+      - SPRING_DATASOURCE_PASSWORD=090600
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=oracle.jdbc.OracleDriver
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on:
+      - oracle-db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+    user: appuser
+    command: ["java", "-jar", "/app/ecowave.jar"]
+
+  oracle-db:
+    image: gvenzl/oracle-xe
+    environment:
+      - ORACLE_PASSWORD=oracle
+      - ORACLE_DATABASE=xe
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    restart: always
+
+volumes:
+  ecowave_data:
+  oracle-data:
